@@ -1,0 +1,44 @@
+
+📘 PROMPT MASTER TEMPLATE
+--------------------------
+Act as [role]. Your task is to [goal].
+Context: [background or use case].
+Constraints: [word limit, tone, audience, etc.].
+Output format: [bullet list, blog, email, code, etc.].
+
+🎯 VARIATIONS FOR DIFFERENT SCENARIOS
+--------------------------------------
+
+1. Act as a...
+   → Act as a senior software engineer. Optimize this Python script for performance.
+
+2. Imagine you’re the world’s best...
+   → Imagine you're the world’s best UX designer. Redesign this login page for speed and accessibility.
+
+3. Think of yourself as a...
+   → Think of yourself as a growth hacker for early-stage startups. What would your viral launch tactic be?
+
+4. You are now...
+   → You are now a venture capitalist reviewing a pitch from a solo founder. Provide critique.
+
+5. Pretend you’re leading...
+   → Pretend you’re leading product at Figma. Propose your next feature based on user feedback.
+
+6. Give me the perspective of a...
+   → Give me the perspective of a startup founder using this SaaS for the first time.
+
+7. You're advising a...
+   → You're advising a student applying for AI research roles. How should they structure their portfolio?
+
+8. Step into the mindset of...
+   → Step into the mindset of a minimalist. How would they critique this landing page?
+
+9. As a master of...
+   → As a master of technical writing, rewrite this error message to be clear and helpful.
+
+10. Channel the voice of...
+   → Channel the voice of Elon Musk and describe this startup idea in one bold sentence.
+
+🔁 BONUS SUPER-PROMPT COMBO
+----------------------------
+Act as the world’s best startup advisor. You're coaching a solo founder launching an AI idea in 2 weeks. Provide 3 MVP directions in bullet points with a confident, practical tone.

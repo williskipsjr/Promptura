@@ -1,0 +1,99 @@
+
+
+Structure Observed in Mastermind Prompt:
+
+1. **Role** – Assign an expert persona (e.g., "Act as a world-class urban planner...")
+2. **Objective Task** – Define a clear objective or problem to solve.
+3. **Context Section** – Provide detailed background or expectations.
+4. **Approach Section** – Break down the steps or dimensions of the solution.
+5. **Response Format** – Define the structure of the expected output.
+6. **Instructions** – Add constraints or best practices to follow.
+
+
+---
+
+Prompt 1: Futuristic Healthcare System Design
+
+Act as a leading biomedical engineer and healthcare futurist. Given the following context, criteria, and instructions, develop a visionary plan for a futuristic city-wide healthcare system powered by AI and biotechnology.
+
+## Context
+The healthcare system should ensure accessibility, affordability, and high standards of care using predictive diagnostics, robotic surgery, telemedicine, and genetic profiling. The system must operate with minimal human error and strong data privacy.
+
+## Approach
+1. Identify core healthcare technologies to be integrated.
+2. Design clinics, hospitals, and home-health interfaces that leverage these technologies.
+3. Create emergency and disaster-response protocols.
+4. Ensure cybersecurity and ethical compliance.
+5. Plan educational campaigns to build public trust.
+
+## Response Format
+- Introduction to the healthcare vision.
+- Summary of integrated technologies and their roles.
+- Infrastructure and workflow design.
+- Data and ethics management.
+- Community engagement and education plan.
+
+## Instructions
+1. Use evidence from current med-tech advancements.
+2. Prioritize equity and patient-centered design.
+3. Address privacy and ethical concerns.
+4. Keep terminology accessible with technical insights.
+
+---
+
+Prompt 2: Climate-Resilient Architecture Blueprint
+
+Act as a world-renowned climate adaptation architect. Based on the following parameters, develop an architectural blueprint for buildings that can withstand extreme weather conditions while being net-zero in emissions.
+
+## Context
+Structures must withstand hurricanes, floods, and heatwaves while generating their own energy and minimizing environmental impact. Use biophilic and regenerative design principles.
+
+## Approach
+1. Choose materials optimized for resilience and sustainability.
+2. Develop building designs for different climate zones.
+3. Integrate passive and active energy systems.
+4. Include water harvesting and flood protection mechanisms.
+5. Design community resilience hubs within the architecture.
+
+## Response Format
+- Vision for climate-adaptive architecture.
+- Design features by region or condition.
+- Energy and water systems plan.
+- Materials list and sourcing strategy.
+- Educational outreach and scalability plan.
+
+## Instructions
+1. Reference climate adaptation case studies.
+2. Focus on affordability and scalability.
+3. Anticipate climate risks by region.
+4. Avoid jargon, explain technical terms.
+
+---
+
+Prompt 3: AI-Empowered Education System of the Future
+
+Act as an educational technologist specializing in AI-based learning environments. Using the context, steps, and format below, develop a strategic plan for an AI-powered national education system.
+
+## Context
+The goal is to personalize learning experiences across K–12 and university levels using adaptive learning platforms, intelligent tutoring systems, and data-driven curriculum development. Accessibility and equity are top priorities.
+
+## Approach
+1. Define technologies needed at each education level.
+2. Plan integration into physical and digital classrooms.
+3. Ensure fairness, bias mitigation, and accessibility.
+4. Design educator support and training programs.
+5. Build monitoring and feedback systems.
+
+## Response Format
+- Introduction to the AI learning framework.
+- Breakdown of tech across education stages.
+- Platform and infrastructure plan.
+- Ethics and fairness guidelines.
+- Roadmap for teacher and student onboarding.
+
+## Instructions
+1. Cite global models and research in AI education.
+2. Use inclusive design standards.
+3. Address data privacy in learning analytics.
+4. Write for a general audience with optional technical depth.
+
