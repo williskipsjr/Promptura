@@ -105,7 +105,7 @@ Because life's too short for mediocre AI conversations! We believe everyone dese
 
 *Built with ❤️ for the AI community. Ready to prompt like a pro?*
 
-**[Try Promptura Now →](https://your-domain.com)**
+**[Try Promptura Now →](https://promptura.netlify.app/)**
 
 ---
 
