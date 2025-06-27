@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -6,6 +6,8 @@ import BoltLogo from '../components/BoltLogo';
 import { motion } from 'framer-motion';
 
 const MainLayout: React.FC = () => {
+  const [isScrolling, setIsScrolling] = useState(false);
+
   // Global mouse tracking for glow effect
   useEffect(() => {
     const syncPointer = (e: PointerEvent) => {
@@ -21,6 +23,47 @@ const MainLayout: React.FC = () => {
     document.addEventListener('pointermove', syncPointer);
     return () => document.removeEventListener('pointermove', syncPointer);
   }, []);
+
+  // Scroll performance optimization
+  useEffect(() => {
+    let scrollTimeout: NodeJS.Timeout;
+
+    const handleScroll = () => {
+      setIsScrolling(true);
+      
+      // Clear existing timeout
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+      
+      // Set new timeout to detect when scrolling stops
+      scrollTimeout = setTimeout(() => {
+        setIsScrolling(false);
+      }, 150);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+    };
+  }, []);
+
+  // Apply/remove scrolling class to body
+  useEffect(() => {
+    if (isScrolling) {
+      document.body.classList.add('is-scrolling');
+    } else {
+      document.body.classList.remove('is-scrolling');
+    }
+    
+    return () => {
+      document.body.classList.remove('is-scrolling');
+    };
+  }, [isScrolling]);
 
   return (
     <div className="min-h-screen flex flex-col">
