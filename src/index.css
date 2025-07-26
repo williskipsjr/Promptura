@@ -238,8 +238,35 @@
 
   /* Performance optimization: Reduce effects during scrolling */
   .is-scrolling {
-    --glass-blur-amount: 4px;
+    --glass-blur-amount: 2px;
     --glow-active: 0;
+  }
+
+  /* Immediate performance optimizations during scrolling */
+  .is-scrolling .glass {
+    backdrop-filter: blur(2px) !important;
+    transition: backdrop-filter 0s !important;
+  }
+
+  .is-scrolling .glass::before,
+  .is-scrolling .glass::after {
+    opacity: 0 !important;
+    transition: opacity 0s !important;
+    animation: none !important;
+  }
+
+  /* Disable expensive animations during scrolling */
+  .is-scrolling * {
+    animation-play-state: paused !important;
+  }
+
+  /* Re-enable animations when scrolling stops */
+  .glass::before {
+    transition: opacity 0.3s ease-out, filter 0.3s ease-out;
+  }
+
+  .glass::after {
+    transition: opacity 0.3s ease-out;
   }
   
   .btn {

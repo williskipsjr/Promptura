@@ -27,9 +27,13 @@ const MainLayout: React.FC = () => {
   // Scroll performance optimization
   useEffect(() => {
     let scrollTimeout: NodeJS.Timeout;
+    let isScrolling = false;
 
     const handleScroll = () => {
-      setIsScrolling(true);
+      if (!isScrolling) {
+        setIsScrolling(true);
+        isScrolling = true;
+      }
       
       // Clear existing timeout
       if (scrollTimeout) {
@@ -39,10 +43,11 @@ const MainLayout: React.FC = () => {
       // Set new timeout to detect when scrolling stops
       scrollTimeout = setTimeout(() => {
         setIsScrolling(false);
-      }, 150);
+        isScrolling = false;
+      }, 100);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('scroll', handleScroll, { passive: true, capture: true });
     
     return () => {
       window.removeEventListener('scroll', handleScroll);
