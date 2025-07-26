@@ -7,6 +7,32 @@ interface PromptConfig {
   domain?: string;
 }
 
+// Model mapping for Together AI API
+// Maps user-friendly model names to actual Together AI model identifiers
+const MODEL_MAP: { [key: string]: string } = {
+  'GPT-4': 'mistralai/Mistral-7B-Instruct-v0.2', // Proxy: High-quality reasoning model
+  'Claude 3': 'NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO', // Proxy: Conversational and ethical reasoning
+  'DeepSeek': 'deepseek-ai/deepseek-coder-33b-instruct', // Direct: Code and technical content
+  'Gemini': 'google/gemma-7b-it', // Proxy: Google's open model
+  'Grok': 'mistralai/Mixtral-8x7B-Instruct-v0.1', // Proxy: Fast and conversational
+  'Perplexity': 'togethercomputer/RedPajama-INCITE-7B-Instruct', // Proxy: Research-focused
+  'Mistral': 'mistralai/Mistral-7B-Instruct-v0.2', // Direct: Mistral model
+  'Llama 2': 'meta-llama/Llama-2-70b-chat-hf', // Direct: Meta's Llama 2
+  'PaLM 2': 'google/gemma-7b-it', // Proxy: Google's alternative
+  'Cohere Command': 'mistralai/Mistral-7B-Instruct-v0.2', // Proxy: General purpose
+  'general': 'mistralai/Mistral-7B-Instruct-v0.2' // Default fallback
+};
+
+// Get the actual model identifier for Together AI API
+function getModelIdentifier(selectedModel?: string): string {
+  if (!selectedModel) {
+    return MODEL_MAP['general'];
+  }
+  
+  // Return mapped model or fallback to default
+  return MODEL_MAP[selectedModel] || MODEL_MAP['general'];
+}
+
 // Rate limiting variables
 let requestCount = 0;
 let lastResetTime = Date.now();
@@ -510,6 +536,9 @@ export async function generatePrompt(
     requestCount++;
     const optimizationPrompt = createOptimizationPrompt(prompt, type, selectedModel, config);
     
+    // Get the actual model identifier for the API call
+    const modelIdentifier = getModelIdentifier(selectedModel);
+    
     const response = await fetch('https://api.together.xyz/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -517,11 +546,11 @@ export async function generatePrompt(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'mistralai/Mistral-7B-Instruct-v0.2',
+        model: modelIdentifier,
         messages: [
           {
             role: 'system',
-            content: 'You are an expert prompt engineer specializing in advanced prompt engineering techniques. Your ONLY task is to transform the given prompt into an optimized version using the specified advanced technique. Return ONLY the final optimized prompt - no explanations, no commentary, no additional text. Just the clean, optimized prompt ready to use.'
+            content: `You are an expert prompt engineer specializing in advanced prompt engineering techniques${selectedModel ? ` with expertise in optimizing prompts for ${selectedModel}` : ''}. Your ONLY task is to transform the given prompt into an optimized version using the specified advanced technique. Return ONLY the final optimized prompt - no explanations, no commentary, no additional text. Just the clean, optimized prompt ready to use.`
           },
           {
             role: 'user',
