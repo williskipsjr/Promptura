@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import BoltLogo from '../components/BoltLogo';
 import { motion } from 'framer-motion';
 
 const MainLayout: React.FC = () => {
@@ -83,7 +82,6 @@ const MainLayout: React.FC = () => {
         <Outlet />
       </motion.main>
       <Footer />
-      <BoltLogo />
     </div>
   );
 };
