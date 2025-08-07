@@ -89,6 +89,11 @@ const ADVANCED_TECHNIQUES = {
     name: 'Socratic Method',
     description: 'Uses questioning to guide discovery and understanding',
     complexity: 'intermediate'
+  },
+  'json-prompting': {
+    name: 'JSON Prompting',
+    description: 'Generates structured JSON outputs for creative and technical projects',
+    complexity: 'advanced'
   }
 };
 
@@ -1001,6 +1006,65 @@ Requirements:
 - Specify exact output format and structure
 - Do NOT use asterisks, bold markers, or markdown formatting
 - Use clear section breaks with plain text
+
+Return only the final optimized prompt.${modelContext}${complexityContext}${domainContext}`;
+
+    case 'json-prompting':
+      return `Transform this prompt using the JSON PROMPTING technique. Return ONLY the optimized prompt without asterisks or formatting markers.
+
+Original prompt: "${prompt}"
+
+Use this advanced structure but remove all asterisks and formatting:
+${opener} expert JSON architect and creative director specializing in structured content generation for multimedia projects.
+
+Primary Objective: [Clear task description]
+
+JSON Structure Requirements:
+Your task is to generate a comprehensive JSON object that captures all essential elements of the request. The JSON should include these key sections:
+
+Core Information:
+- title: A compelling, descriptive title for the project
+- description: Detailed narrative describing the main concept and execution
+- style: Visual and aesthetic approach (e.g., "cinematic", "minimalist", "luxury")
+
+Technical Specifications:
+- camera: Object describing camera movements, framing, and cinematography
+- lighting: Detailed lighting setup and mood specifications
+- environment: Setting, location, and environmental details
+
+Creative Elements:
+- elements: Array of all visual components, props, and design elements
+- motion: Description of animations, transitions, and dynamic movements
+- effects: Special effects, visual enhancements, and post-production elements
+- sound_effects: Audio elements and sound design specifications
+
+Project Metadata:
+- mood: Overall emotional tone and atmosphere
+- color_palette: Specific colors, materials, and visual themes
+- style_reference: Inspiration sources and aesthetic references
+- keywords: Array of relevant tags and descriptors
+- text: Any text overlays or copy requirements
+
+Execution Guidelines:
+1. Ensure all JSON is valid and properly formatted
+2. Use descriptive, actionable language in all fields
+3. Include specific technical details for implementation
+4. Consider the sequence of events and timing
+5. Provide comprehensive coverage of all project aspects
+6. Use arrays for multiple items (elements, keywords, effects)
+7. Include both creative and technical specifications
+
+Output Format: Return a complete, valid JSON object that can be directly used for project implementation. Ensure proper nesting, correct syntax, and comprehensive coverage of all requirements.
+
+Quality Standards: The JSON should be production-ready, technically accurate, and creatively inspiring while maintaining clear structure and actionable details.
+
+Requirements:
+- Start with "${opener}" followed by expert JSON architect role
+- Generate a complete, valid JSON structure
+- Include all essential project elements and specifications
+- Ensure technical accuracy and creative depth
+- Do NOT use asterisks, bold markers, or markdown formatting
+- Return only the final optimized prompt
 
 Return only the final optimized prompt.${modelContext}${complexityContext}${domainContext}`;
 
