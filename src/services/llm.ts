@@ -482,7 +482,7 @@ export function getAvailableTechniques(complexity: 'simple' | 'intermediate' | '
     Object.entries(ADVANCED_TECHNIQUES).filter(([_, technique]) => 
       allowedComplexities.includes(technique.complexity)
     )
-  );
+  ) as typeof ADVANCED_TECHNIQUES;
 }
 
 // Get technique recommendation based on prompt content
