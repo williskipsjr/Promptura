@@ -4,32 +4,38 @@ import {
   Wand2, Copy, Sparkles, Loader, AlertCircle, ThumbsUp, ThumbsDown, 
   Bookmark, BookmarkCheck, Mic, MicOff, Zap, Brain, 
   RotateCcw, Share2, Download, Settings, Layers,
-  ChevronDown, ChevronUp, Play, Pause, Volume2, VolumeX, Lightbulb, Target
+  ChevronDown, ChevronUp, Play, Pause, Volume2, VolumeX, Lightbulb, Target,
+  MessageSquare, Image, Video
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { generatePrompt, getAvailableTechniques, recommendTechnique, ADVANCED_TECHNIQUES, scorePromptQuality } from '../services/llm';
+import { generatePrompt, getAvailableTechniques, recommendTechnique, ADVANCED_TECHNIQUES, scorePromptQuality, autoRewritePrompt, estimateTokens } from '../services/llm';
 import { supabase } from '../lib/supabase';
 import AnimatedPlaceholder from './AnimatedPlaceholder';
 
 interface PromptGeneratorProps {
   onGenerate?: (prompt: string) => void;
+  onPromptChange?: (prompt: string) => void;
   limitToOnePrompt?: boolean;
   selectedModel?: string;
   id?: string;
+  mode?: 'text' | 'image' | 'video';
 }
 
 const PromptGenerator: React.FC<PromptGeneratorProps> = ({ 
   onGenerate,
+  onPromptChange,
   limitToOnePrompt = false,
   selectedModel,
-  id = 'prompt-generator'
+  id = 'prompt-generator',
+  mode = 'text'
 }) => {
   const { currentUser } = useAuth();
   const [prompt, setPrompt] = useState('');
   const [promptType, setPromptType] = useState<string | null>(null);
   const [showEnhanceOptions, setShowEnhanceOptions] = useState(false);
+  const [showTechniques, setShowTechniques] = useState(false);
   const [trialUsed, setTrialUsed] = useState(false);
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -38,6 +44,8 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({
   const [feedback, setFeedback] = useState<'like' | 'dislike' | null>(null);
   const [isSaved, setIsSaved] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [showAlgorithmDropdown, setShowAlgorithmDropdown] = useState(false);
+  const [selectedTechnique, setSelectedTechnique] = useState<string | null>(null);
   
   // New state for advanced features
   const [isListening, setIsListening] = useState(false);
@@ -58,6 +66,31 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({
   
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<any>(null);
+  
+  // Add keyboard event handler for history navigation
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Navigate through prompt history with up/down arrow keys
+    if (e.key === 'ArrowUp' && promptHistory.length > 0 && currentHistoryIndex < promptHistory.length - 1) {
+      e.preventDefault(); // Prevent cursor from moving to start of text
+      const newIndex = currentHistoryIndex + 1;
+      setCurrentHistoryIndex(newIndex);
+      const historyPrompt = promptHistory[promptHistory.length - 1 - newIndex];
+      setPrompt(historyPrompt);
+      onPromptChange?.(historyPrompt);
+    } else if (e.key === 'ArrowDown' && currentHistoryIndex > 0) {
+      e.preventDefault(); // Prevent cursor from moving to end of text
+      const newIndex = currentHistoryIndex - 1;
+      setCurrentHistoryIndex(newIndex);
+      const historyPrompt = promptHistory[promptHistory.length - 1 - newIndex];
+      setPrompt(historyPrompt);
+      onPromptChange?.(historyPrompt);
+    } else if (e.key === 'ArrowDown' && currentHistoryIndex === 0) {
+      e.preventDefault();
+      setCurrentHistoryIndex(-1);
+      setPrompt('');
+      onPromptChange?.('');
+    }
+  };
 
   // Check if trial has been used
   useEffect(() => {
@@ -111,7 +144,10 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({
         if (finalTranscript) {
           setPrompt(prevPrompt => {
             const newPrompt = prevPrompt ? prevPrompt + ' ' + finalTranscript : finalTranscript;
-            return newPrompt.trim();
+            const trimmedPrompt = newPrompt.trim();
+            // Call onPromptChange with the new prompt value
+            onPromptChange?.(trimmedPrompt);
+            return trimmedPrompt;
           });
         }
         
@@ -310,6 +346,53 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({
     }
   };
 
+  // Handle algorithm selection
+  const handleAlgorithmSelect = async (technique: string) => {
+    if (!generatedPrompt) return;
+    
+    setShowAlgorithmDropdown(false);
+    setSelectedTechnique(technique);
+    setIsGenerating(true);
+    setError(null);
+    
+    try {
+      const config = {
+        temperature,
+        maxTokens,
+        style: style as 'creative' | 'balanced' | 'precise',
+        tone: tone as 'professional' | 'casual' | 'friendly',
+        complexity,
+        domain: domain || undefined
+      };
+      
+      const result = await generatePrompt(generatedPrompt, technique, config, selectedModel);
+      setGeneratedPrompt(result);
+      onGenerate?.(result);
+      
+      // Update token count
+      setTokenCount({
+        original: tokenCount.original,
+        optimized: Math.ceil(result.length / 4)
+      });
+      
+      // Save to database if user is logged in
+      if (currentUser) {
+        await supabase.from('prompts').insert({
+          user_id: currentUser.id,
+          original_prompt: prompt,
+          optimized_prompt: result,
+          prompt_type: technique,
+          model_used: selectedModel || 'general',
+        });
+      }
+    } catch (err) {
+      console.error('Error applying algorithm:', err);
+      setError(err instanceof Error ? err.message : 'Failed to apply algorithm. Please try again later.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const handleSmartRewrite = async (type: 'creative' | 'compress' | 'formal' | 'casual') => {
     if (!generatedPrompt) return;
     
@@ -349,6 +432,45 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({
       setTimeout(() => setCopySuccess(false), 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
+    }
+  };
+
+  // Open provider URL with the generated prompt
+  const handleOpenProvider = (provider: string) => {
+    if (!generatedPrompt) return;
+    
+    const encodedPrompt = encodeURIComponent(generatedPrompt);
+    let url = '';
+    
+    // Text generation providers
+    if (provider === 'openai') {
+      url = `https://chat.openai.com/?prompt=${encodedPrompt}`;
+    } else if (provider === 'anthropic') {
+      url = `https://claude.ai/chat?prompt=${encodedPrompt}`;
+    } else if (provider === 'gemini') {
+      url = `https://gemini.google.com/app?prompt=${encodedPrompt}`;
+    }
+    
+    // Image generation providers
+    else if (provider === 'midjourney') {
+      url = `https://www.midjourney.com/app/imagine/describe/?prompt=${encodedPrompt}`;
+    } else if (provider === 'dalle') {
+      url = `https://labs.openai.com/?prompt=${encodedPrompt}`;
+    } else if (provider === 'stability') {
+      url = `https://stability.ai/stable-diffusion?prompt=${encodedPrompt}`;
+    }
+    
+    // Video generation providers
+    else if (provider === 'runway') {
+      url = `https://runwayml.com/generate?prompt=${encodedPrompt}`;
+    } else if (provider === 'pika') {
+      url = `https://pika.art/create?prompt=${encodedPrompt}`;
+    } else if (provider === 'gen2') {
+      url = `https://research.runwayml.com/gen2?prompt=${encodedPrompt}`;
+    }
+    
+    if (url) {
+      window.open(url, '_blank');
     }
   };
 
@@ -436,6 +558,12 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({
           <p className="text-sm text-primary-400">
             <Sparkles className="h-4 w-4 inline mr-2" />
             Enhancement tailored for <span className="font-semibold">{selectedModel}</span>
+            {mode !== 'text' && (
+              <span className="ml-2">
+                ({mode === 'image' ? <Image className="h-4 w-4 inline mx-1" /> : <Video className="h-4 w-4 inline mx-1" />}
+                {mode.charAt(0).toUpperCase() + mode.slice(1)} mode)
+              </span>
+            )}
           </p>
         </motion.div>
       )}
@@ -532,7 +660,12 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({
           <textarea
             ref={textareaRef}
             value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              setPrompt(newValue);
+              onPromptChange?.(newValue);
+            }}
+            onKeyDown={handleKeyDown}
             placeholder=""
             className="input-field min-h-[120px] pr-4"
           />
@@ -815,6 +948,43 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({
               <Layers className="h-4 w-4" />
               Before/After
             </button>
+            
+            {/* Algorithm Button for selecting techniques */}
+            <div className="relative">
+              <button
+                onClick={() => setShowAlgorithmDropdown(!showAlgorithmDropdown)}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm bg-primary-500 hover:bg-primary-600 text-white transition-colors"
+              >
+                <Wand2 className="h-4 w-4" />
+                Algorithm
+                {showAlgorithmDropdown ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </button>
+              
+              {/* Algorithm Dropdown */}
+              <AnimatePresence>
+                {showAlgorithmDropdown && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-full left-0 mt-1 w-64 bg-background-dark border border-border rounded-lg shadow-lg z-10 overflow-hidden"
+                  >
+                    <div className="p-2 max-h-80 overflow-y-auto">
+                      {Object.entries(getAvailableTechniques(complexity)).map(([key, technique]) => (
+                        <button
+                          key={key}
+                          onClick={() => handleAlgorithmSelect(key)}
+                          className="w-full text-left px-3 py-2 hover:bg-background-light rounded-md transition-colors flex flex-col gap-1"
+                        >
+                          <span className="font-medium text-sm text-primary-400">{technique.name}</span>
+                          <span className="text-xs text-neutral-400">{technique.description}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
 
           {/* Before/After Split View */}
@@ -849,9 +1019,66 @@ const PromptGenerator: React.FC<PromptGeneratorProps> = ({
                       {getPromptTypeLabel(promptType)}
                     </span>
                   )}
+                  {mode !== 'text' && (
+                    <span className="text-xs px-2 py-1 bg-accent-500/20 text-accent-400 rounded-full">
+                      {mode === 'image' ? <Image className="h-3 w-3 inline mr-1" /> : <Video className="h-3 w-3 inline mr-1" />}
+                      {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                    </span>
+                  )}
                 </h3>
               </div>
               <p className="text-white whitespace-pre-wrap mb-4">{generatedPrompt}</p>
+            </div>
+          )}
+
+          {/* External Provider Buttons - Based on mode */}
+          {mode !== 'text' && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              <h4 className="w-full text-sm font-medium text-neutral-300 mb-2">Try with:</h4>
+              {mode === 'image' && (
+                <>
+                  <button
+                    onClick={() => window.open(`https://www.midjourney.com/app/imagine/describe/?prompt=${encodeURIComponent(generatedPrompt)}`, '_blank')}
+                    className="px-3 py-1.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors flex items-center gap-1.5 text-sm"
+                  >
+                    <Image className="h-4 w-4" />
+                    Midjourney
+                  </button>
+                  <button
+                    onClick={() => window.open(`https://labs.openai.com/?prompt=${encodeURIComponent(generatedPrompt)}`, '_blank')}
+                    className="px-3 py-1.5 bg-black text-white rounded-md hover:bg-gray-800 transition-colors flex items-center gap-1.5 text-sm"
+                  >
+                    <Image className="h-4 w-4" />
+                    DALL-E
+                  </button>
+                  <button
+                    onClick={() => window.open(`https://stability.ai/stable-diffusion?prompt=${encodeURIComponent(generatedPrompt)}`, '_blank')}
+                    className="px-3 py-1.5 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors flex items-center gap-1.5 text-sm"
+                  >
+                    <Image className="h-4 w-4" />
+                    Stable Diffusion
+                  </button>
+                </>
+              )}
+              
+              {mode === 'video' && (
+                <>
+                  <button
+                    onClick={() => window.open(`https://runwayml.com/generate?prompt=${encodeURIComponent(generatedPrompt)}`, '_blank')}
+                    className="px-3 py-1.5 bg-black text-white rounded-md hover:bg-gray-800 transition-colors flex items-center gap-1.5 text-sm"
+                  >
+                    <Video className="h-4 w-4" />
+                    Runway
+                  </button>
+                  <button
+                    onClick={() => window.open(`https://pika.art/create?prompt=${encodeURIComponent(generatedPrompt)}`, '_blank')}
+                    className="px-3 py-1.5 bg-pink-600 text-white rounded-md hover:bg-pink-700 transition-colors flex items-center gap-1.5 text-sm"
+                  >
+                    <Video className="h-4 w-4" />
+                    Pika
+                  </button>
+                </>
+              )}
             </div>
           )}
 

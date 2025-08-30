@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { Link, useLocation } from "react-router-dom"
-import { DivideIcon as LucideIcon, Home, Globe, Target, BarChart3, LayoutDashboard } from "lucide-react"
+import { DivideIcon as LucideIcon, Home, Globe, Target, BarChart3, LayoutDashboard, BookOpen, Sparkles } from "lucide-react"
 import { cn } from "../../utils/cn"
 import { useAuth } from "../../contexts/AuthContext"
 interface NavItem {
@@ -17,6 +17,8 @@ export function NavBar() {
   const navItems: NavItem[] = [
     { name: 'Home', url: '/', icon: Home },
     // { name: 'Marketplace', url: '/marketplace', icon: Globe }, // Commented out for now
+  
+    { name: 'Prompt Library', url: '/prompt-library', icon: BookOpen },
     { name: 'A/B Testing', url: '/ab-testing', icon: Target },
     { name: 'Compare Models', url: '/compare', icon: BarChart3 },
     ...(currentUser ? [{ name: 'Dashboard', url: '/dashboard', icon: LayoutDashboard }] : []),
@@ -25,6 +27,8 @@ export function NavBar() {
     if (pathname === '/') return 'Home';
     if (pathname.startsWith('/dashboard')) return 'Dashboard';
     // if (pathname === '/marketplace') return 'Marketplace'; // Commented out
+  
+    if (pathname === '/prompt-library') return 'Prompt Library';
     if (pathname === '/ab-testing') return 'A/B Testing';
     if (pathname === '/compare') return 'Compare Models';
     const activeItem = navItems.find(item => item.url === pathname);

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
-import PromptGenerator from '../PromptGenerator';
+import ModernPromptInput from './ModernPromptInput';
 
 const HeroSection: React.FC = () => {
   const [selectedModel, setSelectedModel] = useState<string | undefined>(undefined);
@@ -98,18 +98,14 @@ const HeroSection: React.FC = () => {
             </p>
           </motion.div>
 
-          {/* Prompt Generator */}
+          {/* Modern Prompt Input */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 1.1 }}
-            className="max-w-3xl mx-auto"
+            className="max-w-4xl mx-auto"
           >
-            <PromptGenerator 
-              limitToOnePrompt 
-              selectedModel={selectedModel}
-              id="prompt-generator"
-            />
+            <ModernPromptInput />
           </motion.div>
         </div>
       </div>

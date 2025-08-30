@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Sparkles, Zap, Brain, ArrowRight, Wand2, Target, BarChart3, Globe, GitCompare, TrendingUp, Award } from 'lucide-react';
 import { cn } from '../utils/cn';
 import HeroSection from '../components/home/HeroSection';
+import PromptLibrary from '../components/home/PromptLibrary';
 import FeatureCard from '../components/home/FeatureCard';
 import ModelCard from '../components/home/ModelCard';
 import TestimonialCard from '../components/home/TestimonialCard';
@@ -121,6 +122,9 @@ const HomePage: React.FC = () => {
     <>
       {/* Hero Section */}
       <HeroSection />
+
+      {/* Prompt Library Section */}
+      <PromptLibrary />
 
       {/* Advanced Features Section */}
       <section id="advanced-features" className="py-24">

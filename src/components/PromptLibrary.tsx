@@ -1,9 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingBag } from 'lucide-react';
+import { Wand2 } from 'lucide-react';
 
-const PromptMarketplace: React.FC = () => {
+const PromptLibrary: React.FC = () => {
   const navigate = useNavigate();
 
   return (
@@ -14,10 +14,10 @@ const PromptMarketplace: React.FC = () => {
         transition={{ duration: 0.5 }}
         className="max-w-2xl mx-auto"
       >
-        <ShoppingBag className="w-16 h-16 mx-auto mb-6 text-primary" />
-        <h1 className="text-3xl font-bold mb-4">Prompt Marketplace</h1>
+        <Wand2 className="w-16 h-16 mx-auto mb-6 text-primary" />
+        <h1 className="text-3xl font-bold mb-4">Prompt Library</h1>
         <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-          The Prompt Marketplace has been replaced with our new Promptura interface.
+          The Prompt Library has been replaced with our new Promptura interface.
         </p>
         <button
           onClick={() => navigate('/promptura')}
@@ -30,4 +30,4 @@ const PromptMarketplace: React.FC = () => {
   );
 };
 
-export default PromptMarketplace;
+export default PromptLibrary;

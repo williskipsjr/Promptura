@@ -18,6 +18,8 @@ import SettingsPage from './pages/SettingsPage';
 // Components
 // import PromptMarketplace from './components/PromptMarketplace'; // Commented out for now
 import PromptABTesting from './components/PromptABTesting';
+import PromptLibrary from './components/PromptLibrary';
+
 
 // Layouts
 import MainLayout from './layouts/MainLayout';
@@ -31,6 +33,8 @@ function App() {
             <Route path="/" element={<MainLayout />}>
               <Route index element={<HomePage />} />
               {/* <Route path="/marketplace" element={<PromptMarketplace />} /> */}
+              <Route path="/prompt-library" element={<PromptLibrary />} />
+      
               <Route path="/ab-testing" element={<PromptABTesting />} />
               <Route path="/compare" element={<CompareModelsPage />} />
               <Route path="/login" element={<LoginPage />} />

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
-import { Copy, Trash2, Search, Star, StarOff, Filter, Eye } from 'lucide-react';
+import { Copy, Trash2, Search, Star, StarOff, Filter, Eye, GitBranch } from 'lucide-react';
 import LayoutWrapper from '../components/LayoutWrapper';
 import { supabase } from '../lib/supabase';
 import { cn } from '../utils/cn';
+import { PromptVersioning } from '../components/versioning/PromptVersioning';
+import type { PromptVersion } from '../lib/supabase';
 
 interface SavedPrompt {
   id: string;
@@ -26,6 +28,7 @@ const SavedPromptsPage: React.FC = () => {
   const [selectedPromptTypeFilter, setSelectedPromptTypeFilter] = useState<string>('');
   const [copyStates, setCopyStates] = useState<{ [key: string]: boolean }>({});
   const [selectedPrompt, setSelectedPrompt] = useState<SavedPrompt | null>(null);
+  const [versioningPrompt, setVersioningPrompt] = useState<SavedPrompt | null>(null);
 
   useEffect(() => {
     if (currentUser) {
@@ -93,12 +96,40 @@ const SavedPromptsPage: React.FC = () => {
       if (error) throw error;
       setSavedPrompts(savedPrompts.filter(p => p.id !== id));
       
-      // Close modal if the deleted prompt was being viewed
+      // Close modals if the deleted prompt was being viewed
       if (selectedPrompt?.id === id) {
         setSelectedPrompt(null);
       }
+      if (versioningPrompt?.id === id) {
+        setVersioningPrompt(null);
+      }
     } catch (error) {
       console.error('Error deleting saved prompt:', error);
+    }
+  };
+
+  const handleVersionChange = (version: PromptVersion) => {
+    // Update the prompt in the list with the new version data
+    setSavedPrompts(prev => 
+      prev.map(prompt => 
+        prompt.id === version.prompt_id 
+          ? { 
+              ...prompt, 
+              title: version.title,
+              optimized_prompt: version.content,
+              updated_at: version.updated_at
+            }
+          : prompt
+      )
+    );
+    
+    // Update selected prompt if it's the same one
+    if (selectedPrompt?.id === version.prompt_id) {
+      setSelectedPrompt(prev => prev ? {
+        ...prev,
+        title: version.title,
+        optimized_prompt: version.content
+      } : null);
     }
   };
 
@@ -270,6 +301,13 @@ const SavedPromptsPage: React.FC = () => {
                           <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                         </button>
                         <button
+                          onClick={() => setVersioningPrompt(prompt)}
+                          className="p-1.5 sm:p-2 hover:bg-white/5 rounded-lg transition-colors flex-shrink-0"
+                          title="Version History"
+                        >
+                          <GitBranch className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        </button>
+                        <button
                           onClick={() => handleCopy(prompt.optimized_prompt, prompt.id)}
                           className={cn(
                             "p-1.5 sm:p-2 rounded-lg transition-colors flex-shrink-0",
@@ -419,6 +457,15 @@ const SavedPromptsPage: React.FC = () => {
             </div>
           </motion.div>
         </motion.div>
+      )}
+
+      {/* Prompt Versioning Modal */}
+      {versioningPrompt && (
+        <PromptVersioning
+          prompt={versioningPrompt}
+          onClose={() => setVersioningPrompt(null)}
+          onVersionChange={handleVersionChange}
+        />
       )}
     </LayoutWrapper>
   );

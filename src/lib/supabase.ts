@@ -91,6 +91,42 @@ export interface MarketplacePrompt {
   updated_at: string;
 }
 
+// Prompt Library types
+export interface PromptLibraryEntry {
+  id: string;
+  user_id: string;
+  title: string;
+  description: string;
+  prompt_text: string;
+  before_image_url?: string;
+  after_image_url: string;
+  tags: string[];
+  likes: number;
+  views: number;
+  saves: number;
+  author: string;
+  author_avatar: string;
+  is_public: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PromptLibraryLike {
+  id: string;
+  user_id: string;
+  entry_id: string;
+  liked: boolean;
+  created_at: string;
+}
+
+export interface PromptLibrarySave {
+  id: string;
+  user_id: string;
+  entry_id: string;
+  saved: boolean;
+  created_at: string;
+}
+
 export interface PromptLike {
   id: string;
   user_id: string;
@@ -125,6 +161,40 @@ export interface PromptComment {
       full_name?: string;
     };
   };
+}
+
+// Prompt Versioning types
+export interface PromptVersion {
+  id: string;
+  prompt_id: string;
+  user_id: string;
+  version_number: number;
+  title: string;
+  content: string;
+  change_description?: string;
+  parent_version_id?: string;
+  is_current: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PromptComparison {
+  id: string;
+  user_id: string;
+  version_a_id: string;
+  version_b_id: string;
+  comparison_notes?: string;
+  created_at: string;
+  // Additional fields for UI
+  version_a?: PromptVersion;
+  version_b?: PromptVersion;
+}
+
+export interface VersionHistory {
+  versions: PromptVersion[];
+  total_versions: number;
+  current_version: PromptVersion;
+  recent_changes: PromptVersion[];
 }
 
 // Enhanced filter and stats types
